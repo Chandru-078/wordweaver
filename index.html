@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WordWeaver — AI Sentence Generator | Powered by Groq</title>
+  <meta name="description"
+    content="WordWeaver generates 10 unique, creative sentences from any word using Groq AI. Free, fast, beautiful.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap">
+  <style>
+    /* ============================================
+       CSS VARIABLES — DESIGN SYSTEM
+       ============================================ */
+    :root {
+      --bg: #060612;
+      --bg2: #0C0C1E;
+      --surface: #10102A;
+      --surface2: #14143A;
+      --border: #1F1F45;
+      --border-bright: #2E2E60;
+      --gold: #D4A843;
+      --gold-light: #F0C060;
+      --gold-dim: #8A6820;
+      --violet: #8B5CF6;
+      --violet-light: #A78BFA;
+      --cyan: #06D6C0;
+      --cyan-light: #34EDD8;
+      --text: #EEEEFF;
+      --text-muted: #5555AA;
+      --text-dim: #333366;
+      --error: #FF4466;
+      --success: #06D6A0;
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --ease-smooth: cubic-bezier(0.23, 1, 0.32, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ============================================
+       RESET & BASE
+       ============================================ */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-display);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ============================================
+       CUSTOM SCROLLBAR
+       ============================================ */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--gold-dim);
+      border-radius: 2px;
+    }
+
+    /* ============================================
+       SVG NOISE FILTER (hidden)
+       ============================================ */
+    .svg-filters {
+      position: absolute;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+    }
+
+    /* ============================================
+       BACKGROUND SYSTEM — 3 LAYERS
+       ============================================ */
+
+    /* Layer 2: Drifting Orbs */
+    .bg-orbs {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      will-change: transform;
+      opacity: 0;
+      animation-fill-mode: forwards;
+    }
+
+    .orb--violet {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--violet) 0%, transparent 70%);
+      top: -10%;
+      left: -10%;
+      filter: blur(80px);
+      animation: orbFadeIn 1s var(--ease-smooth) forwards, orbDrift1 20s ease-in-out infinite;
+    }
+
+    .orb--gold {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
+      bottom: -10%;
+      right: -10%;
+      filter: blur(80px);
+      animation: orbFadeIn 1s var(--ease-smooth) forwards, orbDrift2 25s ease-in-out infinite;
+      animation-delay: 0.2s, 0s;
+    }
+
+    .orb--cyan {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, var(--cyan) 0%, transparent 70%);
+      top: 40%;
+      right: 10%;
+      filter: blur(80px);
+      animation: orbFadeIn 1s var(--ease-smooth) forwards, orbDrift3 18s ease-in-out infinite;
+      animation-delay: 0.4s, 0s;
+    }
+
+    @keyframes orbFadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 0.07;
+      }
+    }
+
+    @keyframes orbDrift1 {
+
+      0%,
+      100% {
+        transform: translate(0, 0);
+      }
+
+      25% {
+        transform: translate(60px, 40px);
+      }
+
+      50% {
+        transform: translate(30px, 80px);
+      }
+
+      75% {
+        transform: translate(-30px, 50px);
+      }
+    }
+
+    @keyframes orbDrift2 {
+
+      0%,
+      100% {
+        transform: translate(0, 0);
+      }
+
+      25% {
+        transform: translate(-50px, -30px);
+      }
+
+      50% {
+        transform: translate(-80px, -60px);
+      }
+
+      75% {
+        transform: translate(-20px, -40px);
+      }
+    }
+
+    @keyframes orbDrift3 {
+
+      0%,
+      100% {
+        transform: translate(0, 0);
+      }
+
+      33% {
+        transform: translate(-40px, 50px);
+      }
+
+      66% {
+        transform: translate(40px, -30px);
+      }
+    }
+
+    /* Layer 3: Noise Grain */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.025;
+    }
+
+    .noise-overlay rect {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ============================================
+       MAIN CONTAINER
+       ============================================ */
+    .app {
+      position: relative;
+      z-index: 2;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ============================================
+       PAGE LOAD ANIMATIONS
+       ============================================ */
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      20% {
+        transform: translateX(-8px);
+      }
+
+      40% {
+        transform: translateX(8px);
+      }
+
+      60% {
+        transform: translateX(-5px);
+      }
+
+      80% {
+        transform: translateX(5px);
+      }
+    }
+
+    /* ============================================
+       HEADER
+       ============================================ */
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      position: relative;
+      opacity: 0;
+      animation: slideDown 0.7s var(--ease-out) 0.2s forwards;
+    }
+
+    .header__logo {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      line-height: 1.1;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 40%, var(--violet-light) 100%);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: logoShimmer 4s ease-in-out infinite;
+    }
+
+    @keyframes logoShimmer {
+
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+
+    .header__subtitle {
+      font-family: var(--font-mono);
+      font-weight: 300;
+      font-size: 0.7rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    /* Gear Icon */
+    .settings-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: transform 0.4s var(--ease-smooth), color 0.3s;
+      will-change: transform;
+      padding: 0.5rem;
+      line-height: 1;
+    }
+
+    .settings-btn:hover {
+      transform: rotate(90deg);
+      color: var(--gold);
+    }
+
+    /* ============================================
+       INPUT CARD
+       ============================================ */
+    .input-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      transition: border-color 0.3s var(--ease-smooth);
+      opacity: 0;
+      animation: slideUp 0.7s var(--ease-out) 0.4s forwards;
+      contain: layout style paint;
+      transform: translateZ(0);
+      position: relative;
+    }
+
+    .input-card:focus-within {
+      border-color: var(--gold);
+    }
+
+    .input-card__label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 0.5rem;
+      transition: transform 0.3s var(--ease-smooth), color 0.3s;
+      will-change: transform;
+    }
+
+    .input-card:focus-within .input-card__label {
+      transform: translateY(-4px);
+      color: var(--gold);
+    }
+
+    .input-card__input {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 700;
+      color: var(--text);
+      background: transparent;
+      border: none;
+      outline: none;
+      width: 100%;
+      caret-color: var(--gold);
+    }
+
+    .input-card__input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .input-card__counter {
+      position: absolute;
+      bottom: 0.8rem;
+      right: 1.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    /* ============================================
+       GENERATE BUTTON
+       ============================================ */
+    .generate-btn {
+      width: 100%;
+      padding: 1.1rem;
+      margin-top: 1rem;
+      background: var(--gold);
+      color: #060612;
+      border: none;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s var(--ease-spring);
+      will-change: transform;
+      opacity: 0;
+      animation: fadeIn 0.5s var(--ease-out) 0.6s forwards;
+      transform: translateZ(0);
+    }
+
+    .generate-btn:hover:not(:disabled) {
+      transform: translateY(-2px) scale(1.01);
+    }
+
+    .generate-btn:active:not(:disabled) {
+      transform: translateY(0) scale(0.99);
+    }
+
+    .generate-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    /* Loading shimmer sweep */
+    .generate-btn--loading::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+      animation: shimmerSweep 1.5s infinite;
+      will-change: transform;
+    }
+
+    @keyframes shimmerSweep {
+      0% {
+        transform: translateX(-200%);
+      }
+
+      100% {
+        transform: translateX(200%);
+      }
+    }
+
+    /* 3-dot loading pulse */
+    .dot-pulse {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dot-pulse__dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #060612;
+      animation: dotScale 0.9s ease-in-out infinite;
+      will-change: transform;
+    }
+
+    .dot-pulse__dot:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .dot-pulse__dot:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    @keyframes dotScale {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.5);
+      }
+    }
+
+    /* ============================================
+       STATUS LINE
+       ============================================ */
+    .status {
+      text-align: center;
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      min-height: 1.2em;
+      transition: color 0.3s;
+    }
+
+    .status--generating {
+      color: var(--gold);
+    }
+
+    .status--success {
+      color: var(--success);
+    }
+
+    .status--error {
+      color: var(--error);
+    }
+
+    /* ============================================
+       RESULTS GRID
+       ============================================ */
+    .results {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 1.5rem;
+    }
+
+    /* ============================================
+       SENTENCE CARD
+       ============================================ */
+    .sentence-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.2rem 1.4rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      position: relative;
+      border-left: 3px solid var(--gold);
+      contain: layout style paint;
+      transform: translateZ(0);
+      will-change: transform;
+      transition: transform 0.2s var(--ease-smooth);
+      opacity: 0;
+      animation: cardReveal 0.5s var(--ease-out) calc(var(--i) * 80ms) forwards;
+    }
+
+    .sentence-card:hover {
+      transform: translateX(6px);
+    }
+
+    .sentence-card--violet {
+      border-left-color: var(--violet);
+    }
+
+    .sentence-card--cyan {
+      border-left-color: var(--cyan);
+    }
+
+    @keyframes cardReveal {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .sentence-card__number {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--gold);
+      min-width: 2.5rem;
+      padding-top: 0.3rem;
+      flex-shrink: 0;
+    }
+
+    .sentence-card__text {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--text);
+      flex: 1;
+      letter-spacing: 0.01em;
+    }
+
+    .sentence-card__text mark {
+      color: var(--gold-light);
+      background: none;
+      font-weight: 600;
+    }
+
+    .sentence-card__copy {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      cursor: pointer;
+      padding: 0.3rem;
+      transition: color 0.2s, transform 0.3s var(--ease-spring);
+      will-change: transform;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .sentence-card__copy:hover {
+      color: var(--gold);
+    }
+
+    .sentence-card__copy--copied {
+      color: var(--success);
+      animation: copyPop 0.3s var(--ease-spring);
+    }
+
+    @keyframes copyPop {
+      from {
+        transform: scale(0);
+      }
+
+      to {
+        transform: scale(1);
+      }
+    }
+
+    /* ============================================
+       COPY ALL BUTTON
+       ============================================ */
+    .copy-all-btn {
+      width: 100%;
+      padding: 0.9rem;
+      margin-top: 1rem;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border-bright);
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: border-color 0.3s, color 0.3s;
+      opacity: 0;
+      animation: fadeIn 0.5s var(--ease-out) calc(10 * 80ms + 200ms) forwards;
+    }
+
+    .copy-all-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    /* ============================================
+       TOAST NOTIFICATION
+       ============================================ */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--surface2);
+      border: 1px solid var(--border-bright);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      padding: 0.8rem 1.4rem;
+      border-radius: 6px;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(20px);
+      will-change: transform, opacity;
+      animation: toastIn 0.3s var(--ease-out) forwards;
+      pointer-events: none;
+    }
+
+    .toast--out {
+      animation: toastOut 0.3s var(--ease-smooth) forwards;
+    }
+
+    @keyframes toastIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes toastOut {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      to {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+    }
+
+    /* ============================================
+       SETTINGS MODAL
+       ============================================ */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 6, 18, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    .modal-backdrop--open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      width: 90%;
+      max-width: 460px;
+      padding: 2.5rem 2rem;
+      position: relative;
+      transform: translateY(20px) scale(0.97);
+      will-change: transform;
+      transition: transform 0.4s var(--ease-spring);
+    }
+
+    .modal-backdrop--open .modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal__title {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .modal__desc {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      margin-bottom: 2rem;
+    }
+
+    .modal__label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal__input-wrap {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal__input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.9rem 2.8rem 0.9rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .modal__input:focus {
+      border-color: var(--gold);
+    }
+
+    .modal__eye {
+      position: absolute;
+      right: 0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.2rem;
+      transition: color 0.2s;
+    }
+
+    .modal__eye:hover {
+      color: var(--gold);
+    }
+
+    .modal__save {
+      width: 100%;
+      padding: 0.9rem;
+      background: var(--gold);
+      color: #060612;
+      border: none;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.25s var(--ease-spring);
+      will-change: transform;
+    }
+
+    .modal__save:hover {
+      transform: translateY(-2px) scale(1.01);
+    }
+
+    .modal__save:active {
+      transform: translateY(0) scale(0.99);
+    }
+
+    .modal__link {
+      display: block;
+      text-align: center;
+      margin-top: 1.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--gold);
+      text-decoration: none;
+      letter-spacing: 1px;
+      transition: color 0.2s;
+    }
+
+    .modal__link:hover {
+      color: var(--gold-light);
+    }
+
+    .modal__close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.3rem;
+      transition: color 0.2s, transform 0.3s var(--ease-spring);
+      will-change: transform;
+    }
+
+    .modal__close:hover {
+      color: var(--text);
+      transform: rotate(90deg);
+    }
+
+    .modal__message {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      letter-spacing: 1px;
+    }
+
+    /* ============================================
+       FOOTER
+       ============================================ */
+    .footer {
+      text-align: center;
+      margin-top: auto;
+      padding-top: 3rem;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 768px) and (min-width: 481px) {
+      .app {
+        max-width: 600px;
+        padding: 2rem 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .app {
+        padding: 1.25rem;
+      }
+
+      .header__logo {
+        font-size: clamp(2.2rem, 10vw, 3rem);
+      }
+
+      .input-card__input {
+        font-size: clamp(1.6rem, 7vw, 2.2rem);
+      }
+
+      .generate-btn {
+        padding: 1rem;
+      }
+
+      .sentence-card {
+        padding: 1rem;
+      }
+
+      .input-card {
+        padding: 1.5rem;
+      }
+
+      .settings-btn {
+        top: 0;
+        right: -0.2rem;
+      }
+
+      .toast {
+        right: 1rem;
+        left: 1rem;
+        bottom: 1rem;
+      }
+    }
+
+    /* ============================================
+       SHAKE ANIMATION CLASS
+       ============================================ */
+    .shake {
+      animation: shake 0.5s var(--ease-smooth);
+    }
+
+    /* Utility: hidden */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- SVG Filters -->
+  <svg class="svg-filters" aria-hidden="true">
+    <filter id="noiseFilter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+    </filter>
+  </svg>
+
+  <!-- Layer 2: Background Orbs -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb--violet"></div>
+    <div class="orb orb--gold"></div>
+    <div class="orb orb--cyan"></div>
+  </div>
+
+  <!-- Layer 3: Noise Grain -->
+  <svg class="noise-overlay" aria-hidden="true">
+    <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+  </svg>
+
+  <!-- Settings Modal -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" id="modal">
+      <button class="modal__close" id="modalClose" aria-label="Close settings">✕</button>
+      <h2 class="modal__title">Settings</h2>
+      <p class="modal__desc">Configure your Groq API key to start generating sentences.</p>
+      <p class="modal__message hidden" id="modalMessage"></p>
+      <label class="modal__label" for="apiKeyInput">API KEY</label>
+      <div class="modal__input-wrap">
+        <input class="modal__input" id="apiKeyInput" type="password" placeholder="gsk_..." autocomplete="off"
+          spellcheck="false">
+        <button class="modal__eye" id="eyeToggle" type="button" aria-label="Toggle key visibility">👁</button>
+      </div>
+      <button class="modal__save" id="saveKey">SAVE KEY</button>
+      <a class="modal__link" href="https://console.groq.com" target="_blank" rel="noopener noreferrer">Get Free API Key
+        →</a>
+    </div>
+  </div>
+
+  <!-- App Container -->
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <h1 class="header__logo">WordWeaver</h1>
+      <p class="header__subtitle">Ten sentences. One word. Infinite possibilities.</p>
+      <button class="settings-btn" id="settingsBtn" aria-label="Open settings">⚙</button>
+    </header>
+
+    <!-- Input Card -->
+    <div class="input-card" id="inputCard">
+      <label class="input-card__label" for="wordInput">ENTER A WORD</label>
+      <input class="input-card__input" id="wordInput" type="text" placeholder="serendipity..." maxlength="30"
+        autocomplete="off" spellcheck="false">
+      <span class="input-card__counter" id="charCounter">0/30</span>
+    </div>
+
+    <!-- Generate Button -->
+    <button class="generate-btn" id="generateBtn">
+      <span id="btnText">GENERATE SENTENCES</span>
+      <span class="dot-pulse hidden" id="btnLoader">
+        <span class="dot-pulse__dot"></span>
+        <span class="dot-pulse__dot"></span>
+        <span class="dot-pulse__dot"></span>
+      </span>
+    </button>
+
+    <!-- Status Line -->
+    <p class="status" id="statusLine">READY</p>
+
+    <!-- Results -->
+    <div class="results hidden" id="results"></div>
+
+    <!-- Copy All -->
+    <button class="copy-all-btn hidden" id="copyAllBtn">COPY ALL SENTENCES</button>
+
+    <!-- Footer -->
+    <footer class="footer">
+      Powered by Groq AI · 100% Free · No data stored
+    </footer>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toastContainer"></div>
+
+  <script>
+    /* ============================================
+       DOM REFERENCES
+       ============================================ */
+    const $ = (s) => document.querySelector(s);
+    const modalBackdrop = $('#modalBackdrop');
+    const modal = $('#modal');
+    const modalClose = $('#modalClose');
+    const modalMessage = $('#modalMessage');
+    const apiKeyInput = $('#apiKeyInput');
+    const eyeToggle = $('#eyeToggle');
+    const saveKeyBtn = $('#saveKey');
+    const settingsBtn = $('#settingsBtn');
+    const wordInput = $('#wordInput');
+    const charCounter = $('#charCounter');
+    const inputCard = $('#inputCard');
+    const generateBtn = $('#generateBtn');
+    const btnText = $('#btnText');
+    const btnLoader = $('#btnLoader');
+    const statusLine = $('#statusLine');
+    const resultsContainer = $('#results');
+    const copyAllBtn = $('#copyAllBtn');
+    const toastContainer = $('#toastContainer');
+
+    /* ============================================
+       STATE
+       ============================================ */
+    let isGenerating = false;
+    let currentSentences = [];
+    let debounceTimer = null;
+
+    /* ============================================
+       HELPERS
+       ============================================ */
+    function getApiKey() {
+      return localStorage.getItem('ww_groq_key') || '';
+    }
+
+    function setApiKey(key) {
+      localStorage.setItem('ww_groq_key', key);
+    }
+
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      toastContainer.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('toast--out');
+        toast.addEventListener('animationend', () => toast.remove());
+      }, 2000);
+    }
+
+    function setStatus(text, type) {
+      statusLine.textContent = text;
+      statusLine.className = 'status';
+      if (type) statusLine.classList.add(`status--${type}`);
+    }
+
+    function copyToClipboard(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text);
+      }
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      return Promise.resolve();
+    }
+
+    /* ============================================
+       SETTINGS MODAL
+       ============================================ */
+    function openModal(message) {
+      if (message) {
+        modalMessage.textContent = message;
+        modalMessage.classList.remove('hidden');
+      } else {
+        modalMessage.classList.add('hidden');
+      }
+      apiKeyInput.value = getApiKey();
+      modalBackdrop.classList.add('modal-backdrop--open');
+    }
+
+    function closeModal() {
+      modalBackdrop.classList.remove('modal-backdrop--open');
+    }
+
+    settingsBtn.addEventListener('click', () => openModal());
+
+    modalClose.addEventListener('click', closeModal);
+
+    modalBackdrop.addEventListener('click', (e) => {
+      if (e.target === modalBackdrop) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    eyeToggle.addEventListener('click', () => {
+      const isPassword = apiKeyInput.type === 'password';
+      apiKeyInput.type = isPassword ? 'text' : 'password';
+      eyeToggle.textContent = isPassword ? '🙈' : '👁';
+    });
+
+    saveKeyBtn.addEventListener('click', () => {
+      const key = apiKeyInput.value.trim();
+      if (!key) {
+        showToast('Please enter an API key');
+        return;
+      }
+      setApiKey(key);
+      showToast('API key saved');
+      closeModal();
+    });
+
+    /* ============================================
+       CHARACTER COUNTER (debounced)
+       ============================================ */
+    wordInput.addEventListener('input', () => {
+      charCounter.textContent = `${wordInput.value.length}/30`;
+    }, { passive: true });
+
+    /* ============================================
+       GENERATE SENTENCES
+       ============================================ */
+    function highlightKeyword(sentence, word) {
+      if (!word) return sentence;
+      const regex = new RegExp(`(${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      return sentence.replace(regex, '<mark>$1</mark>');
+    }
+
+    function getCardColorClass(index) {
+      const mod = index % 3;
+      if (mod === 0) return ''; // gold (default)
+      if (mod === 1) return 'sentence-card--violet';
+      return 'sentence-card--cyan';
+    }
+
+    function renderSentences(sentences, word) {
+      currentSentences = sentences;
+      resultsContainer.innerHTML = '';
+      resultsContainer.classList.remove('hidden');
+
+      sentences.forEach((sentence, i) => {
+        const card = document.createElement('div');
+        card.className = `sentence-card ${getCardColorClass(i)}`;
+        card.style.setProperty('--i', i);
+
+        const num = document.createElement('span');
+        num.className = 'sentence-card__number';
+        num.textContent = String(i + 1).padStart(2, '0');
+
+        const text = document.createElement('p');
+        text.className = 'sentence-card__text';
+        text.innerHTML = highlightKeyword(sentence, word);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'sentence-card__copy';
+        copyBtn.textContent = '📋';
+        copyBtn.setAttribute('aria-label', `Copy sentence ${i + 1}`);
+        copyBtn.addEventListener('click', () => {
+          copyToClipboard(sentence).then(() => {
+            copyBtn.textContent = '✓';
+            copyBtn.classList.add('sentence-card__copy--copied');
+            showToast('Sentence copied');
+            setTimeout(() => {
+              copyBtn.textContent = '📋';
+              copyBtn.classList.remove('sentence-card__copy--copied');
+            }, 2000);
+          });
+        });
+
+        card.appendChild(num);
+        card.appendChild(text);
+        card.appendChild(copyBtn);
+        resultsContainer.appendChild(card);
+      });
+
+      copyAllBtn.classList.remove('hidden');
+      // Reset animation on copy-all by re-triggering
+      copyAllBtn.style.animation = 'none';
+      requestAnimationFrame(() => {
+        copyAllBtn.style.animation = '';
+      });
+    }
+
+    function parseSentences(raw) {
+      const lines = raw.split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .map(line => line.replace(/^\d+[\.\)\-:]\s*/, '').trim())
+        .filter(line => line.length > 0);
+      return lines.slice(0, 10);
+    }
+
+    async function generateSentences() {
+      if (isGenerating) return;
+
+      const apiKey = getApiKey();
+      if (!apiKey) {
+        openModal('Add your free Groq API key to get started');
+        return;
+      }
+
+      const word = wordInput.value.trim();
+      if (!word) {
+        inputCard.classList.add('shake');
+        inputCard.addEventListener('animationend', () => {
+          inputCard.classList.remove('shake');
+        }, { once: true });
+        return;
+      }
+
+      isGenerating = true;
+      generateBtn.disabled = true;
+      btnText.classList.add('hidden');
+      btnLoader.classList.remove('hidden');
+      generateBtn.classList.add('generate-btn--loading');
+      resultsContainer.classList.add('hidden');
+      resultsContainer.innerHTML = '';
+      copyAllBtn.classList.add('hidden');
+      setStatus('GENERATING...', 'generating');
+
+      try {
+        const apiKey = getApiKey();
+        const headers = {
+          'Content-Type': 'application/json'
+        };
+
+        // If user provided a custom key in settings, pass it to the backend
+        if (apiKey) {
+          headers['x-custom-api-key'] = apiKey;
+        }
+
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ word: word })
+        });
+
+        if (!response.ok) {
+          let errMsg = '';
+          try {
+            const errData = await response.json();
+            errMsg = errData.error || errData.message || '';
+          } catch (_) { }
+
+          if (response.status === 401 || response.status === 403) {
+            // Unset invalid key if they typed one
+            if (apiKey) setApiKey('');
+            openModal('API key missing or invalid. Please add your Groq API key.');
+            throw new Error('Configuration required');
+          } else if (response.status === 429) {
+            throw new Error('Rate limit hit — please wait a moment and try again');
+          } else if (response.status === 400) {
+            throw new Error(errMsg || 'Bad request — please try again');
+          } else {
+            throw new Error(errMsg || `API error (${response.status}) — please try again`);
+          }
+        }
+
+        const sentences = await response.json();
+
+        if (sentences.length === 0) {
+          throw new Error('Unexpected response — please try again');
+        }
+
+        renderSentences(sentences, word);
+        setStatus(`${sentences.length} SENTENCES GENERATED`, 'success');
+
+      } catch (err) {
+        if (err.name === 'TypeError' && err.message.includes('fetch')) {
+          setStatus('Connection failed — check your internet', 'error');
+        } else {
+          setStatus(err.message || 'An error occurred — please try again', 'error');
+        }
+      } finally {
+        isGenerating = false;
+        generateBtn.disabled = false;
+        btnText.classList.remove('hidden');
+        btnLoader.classList.add('hidden');
+        generateBtn.classList.remove('generate-btn--loading');
+      }
+    }
+
+    /* ============================================
+       EVENT LISTENERS
+       ============================================ */
+    generateBtn.addEventListener('click', () => {
+      // debounce
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(generateSentences, 300);
+    });
+
+    wordInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(generateSentences, 300);
+      }
+    });
+
+    copyAllBtn.addEventListener('click', () => {
+      if (currentSentences.length === 0) return;
+      const allText = currentSentences.map((s, i) => `${i + 1}. ${s}`).join('\n');
+      copyToClipboard(allText).then(() => {
+        showToast('All sentences copied');
+      });
+    });
+
+    /* Passive scroll listeners */
+    window.addEventListener('scroll', () => { }, { passive: true });
+
+    /* ============================================
+       ON LOAD
+       ============================================ */
+    window.addEventListener('DOMContentLoaded', () => {
+      // We assume the Vercel backend has the API key embedded via ENV variables.
+      // If requests fail with 401/403, the generateSentences try/catch block will 
+      // automatically open the Settings modal to prompt the user for a custom key.
+    });
+  </script>
+</body>
+
+</html>

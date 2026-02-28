@@ -1,0 +1,19 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/generate",
+      "destination": "/api/generate"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    }
+  ]
+}
