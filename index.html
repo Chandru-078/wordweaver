@@ -1279,12 +1279,6 @@
     async function generateSentences() {
       if (isGenerating) return;
 
-      const apiKey = getApiKey();
-      if (!apiKey) {
-        openModal('Add your free Groq API key to get started');
-        return;
-      }
-
       const word = wordInput.value.trim();
       if (!word) {
         inputCard.classList.add('shake');
